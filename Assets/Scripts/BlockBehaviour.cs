@@ -8,7 +8,7 @@ public class BlockBehaviour : MonoBehaviour {
     float step = 1;
     bool moving = true;
 
-    public Transform[] blocks;
+    public GameObject[] blocks;
 
     public int nextRotation = 0;
     private int curRotation = 0;
@@ -93,9 +93,9 @@ public class BlockBehaviour : MonoBehaviour {
             {
                 for (int j = 0; j < level.gridTaken.Count; j++)
                 {
-                    if(transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].position.y)
+                    if(transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y)
                     {
-                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].position.x + 1) //Check for left obstacle
+                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x + 1) //Check for left obstacle
                         {
                             blockMovement = true;
                         }
@@ -108,9 +108,9 @@ public class BlockBehaviour : MonoBehaviour {
             {
                 for (int j = 0; j < level.gridTaken.Count; j++)
                 {
-                    if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].position.y)
+                    if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y)
                     {
-                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].position.x - 1) //Check for left obstacle
+                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x - 1) //Check for left obstacle
                         {
                             blockMovement = true;
                         }
@@ -143,7 +143,7 @@ public class BlockBehaviour : MonoBehaviour {
                     {
                         for (int j = 0; j < level.gridTaken.Count; j++)
                         {
-                            if (transform.position + rotations[nextRotation].blockPositions[i] == level.gridTaken[j].position)
+                            if (transform.position + rotations[nextRotation].blockPositions[i] == level.gridTaken[j].transform.position)
                             {
                                 canRotateBlockCheck = false;
                             }
@@ -177,6 +177,7 @@ public class BlockBehaviour : MonoBehaviour {
 
     void MoveDown()
     {
+        level.gridTaken.RemoveAll(GameObject => GameObject == null); //clear list to avoid errors
         bool onGround = CheckIfBottom();
         bool blockBelow = false;
         if (!onGround)
@@ -192,7 +193,7 @@ public class BlockBehaviour : MonoBehaviour {
         //level.TakeSpace(transform.position + rotations[curRotation].blockPositions[j]);
         for (int i = 0; i < blocks.Length; i++)
             level.TakeSpace(blocks[i]);
-
+        level.CheckLineFull();
         spawn.CreateBlock();
     }
 
@@ -217,9 +218,9 @@ public class BlockBehaviour : MonoBehaviour {
         {
             for(int j = 0; j < level.gridTaken.Count; j++)
             {
-                if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].position.y + 1)
+                if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y + 1)
                 {
-                    if(transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].position.x)
+                    if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x)
                     {
                         canPlace = true;
                         break;

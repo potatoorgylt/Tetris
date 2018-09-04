@@ -127,10 +127,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blocks:
-  - {fileID: 5499690754499114220}
-  - {fileID: 336985953788465626}
-  - {fileID: 3974995423532865879}
-  - {fileID: 3631701106777213386}
+  - {fileID: 9119177567825452648}
+  - {fileID: 654052053987546292}
+  - {fileID: 4353053607397917097}
+  - {fileID: 8100094542515940260}
   nextRotation: 1
   rotations:
   - blockPositions:
@@ -143,7 +143,6 @@ MonoBehaviour:
     - {x: 0.5, y: -0.5, z: 0}
     - {x: 0.5, y: 0.5, z: 0}
     - {x: 0.5, y: 1.5, z: 0}
-  keyDelay: 0.05
 --- !u!1 &4353053607397917097
 GameObject:
   m_ObjectHideFlags: 0

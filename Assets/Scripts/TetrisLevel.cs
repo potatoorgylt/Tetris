@@ -12,7 +12,7 @@ public class TetrisLevel : MonoBehaviour {
 
     public Vector3[,] grid;
     //[HideInInspector]
-    public List<Transform> gridTaken;
+    public List<GameObject> gridTaken;
 
     [HideInInspector]
     public float bottom;
@@ -57,46 +57,49 @@ public class TetrisLevel : MonoBehaviour {
         }
     }
 
-    public void TakeSpace(Transform space)
+    public void TakeSpace(GameObject space)
     {
         gridTaken.Add(space);
         
     }
-    private void Update()
-    {
-        timePassed += Time.deltaTime;
-        if (timePassed >= moveTime)
-        {
-            RowFull();
-            timePassed = 0f;
-        }
-    }
 
-    void RowFull()
+    public void CheckLineFull()
     {
         int i = 0;
+        List<float> fullRowPositions = new List<float>();
         List<int> rowFull = new List<int>();
-        float bottomToTop = bottom - 0.5f;
+        float bottomToTop = bottom - 0.5f + 1.0f;
         Debug.Log("...rowFull function...");
+
         while (bottomToTop < top)
         {
+            rowFull.Add(0);
             for (int j = 0; j < gridTaken.Count; j++)
             {
-                rowFull.Add(0);
-                Debug.Log(bottomToTop);
-                if(gridTaken[j].position.y == bottomToTop)
+                if (gridTaken[j].transform.position.y == bottomToTop)
                 {
                     rowFull[i]++;
-                    Debug.Log("rowFull[" + j + "]: " + rowFull[j]);
-                    if(rowFull[j] >= gridWidth-1)
+                    if (rowFull[i] >= gridWidth)
                     {
-                        Destroy(gridTaken[j]);
-                        gridTaken.Remove(gridTaken[j]);
+                        fullRowPositions.Add(bottomToTop);
                     }
                 }
             }
+            Debug.Log("rowFull[" + i + "]: " + rowFull[i]);
+            Debug.Log(bottomToTop);
             bottomToTop++;
             i++;
+        }
+        //Remove the objects
+        for (int j = 0; j < fullRowPositions.Count; j++)
+        {
+            for(int k = 0; k < gridTaken.Count; k++)
+            {
+                if (gridTaken[k].transform.position.y == fullRowPositions[j])
+                {
+                    Destroy(gridTaken[k]);
+                }
+            }
         }
     }
 }
