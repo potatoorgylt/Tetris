@@ -91,15 +91,17 @@ public class BlockBehaviour : MonoBehaviour {
         {
             if (direction.x < 0)
             {
+
                 for (int j = 0; j < level.gridTaken.Count; j++)
                 {
-                    if(transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y)
-                    {
-                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x + 1) //Check for left obstacle
+                    if(level.gridTaken[j] != null)
+                        if(transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y)
                         {
-                            blockMovement = true;
+                            if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x + 1) //Check for left obstacle
+                            {
+                                blockMovement = true;
+                            }
                         }
-                    }
                 }
                 if (transform.position.x + rotations[curRotation].blockPositions[i].x < level.leftBorder + 1) //Check for left border
                     blockMovement = true;
@@ -108,6 +110,7 @@ public class BlockBehaviour : MonoBehaviour {
             {
                 for (int j = 0; j < level.gridTaken.Count; j++)
                 {
+                    if (level.gridTaken[j] != null)
                     if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y)
                     {
                         if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x - 1) //Check for left obstacle
@@ -143,10 +146,11 @@ public class BlockBehaviour : MonoBehaviour {
                     {
                         for (int j = 0; j < level.gridTaken.Count; j++)
                         {
-                            if (transform.position + rotations[nextRotation].blockPositions[i] == level.gridTaken[j].transform.position)
-                            {
-                                canRotateBlockCheck = false;
-                            }
+                            if (level.gridTaken[j] != null)
+                                if (transform.position + rotations[nextRotation].blockPositions[i] == level.gridTaken[j].transform.position)
+                                {
+                                    canRotateBlockCheck = false;
+                                }
                         }
                     }
                     toRotate++;
@@ -218,14 +222,15 @@ public class BlockBehaviour : MonoBehaviour {
         {
             for(int j = 0; j < level.gridTaken.Count; j++)
             {
-                if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y + 1)
-                {
-                    if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x)
+                if (level.gridTaken[j] != null)
+                    if (transform.position.y + rotations[curRotation].blockPositions[i].y == level.gridTaken[j].transform.position.y + 1)
                     {
-                        canPlace = true;
-                        break;
+                        if (transform.position.x + rotations[curRotation].blockPositions[i].x == level.gridTaken[j].transform.position.x)
+                        {
+                            canPlace = true;
+                            break;
+                        }
                     }
-                }
             }
         }
         if(canPlace == true)

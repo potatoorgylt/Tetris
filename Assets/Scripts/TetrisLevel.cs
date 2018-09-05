@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TetrisLevel : MonoBehaviour {
+public class TetrisLevel : PlacedBlocks {
 
     public float moveTime = 1.0f;
     float timePassed = 0f;
@@ -12,7 +12,7 @@ public class TetrisLevel : MonoBehaviour {
 
     public Vector3[,] grid;
     //[HideInInspector]
-    public List<GameObject> gridTaken;
+    public List<GameObject> gridTaken; //Deprecated
 
     [HideInInspector]
     public float bottom;
@@ -57,10 +57,9 @@ public class TetrisLevel : MonoBehaviour {
         }
     }
 
-    public void TakeSpace(GameObject space)
+    public void TakeSpace(GameObject space) //Deprecated
     {
         gridTaken.Add(space);
-        
     }
 
     public void CheckLineFull()
@@ -98,6 +97,18 @@ public class TetrisLevel : MonoBehaviour {
                 if (gridTaken[k].transform.position.y == fullRowPositions[j])
                 {
                     Destroy(gridTaken[k]);
+                }
+            }
+        }
+
+        //Move down above
+        for (int j = 0; j < fullRowPositions.Count; j++)
+        {
+            for (int m = 0; m < gridTaken.Count; m++)
+            {
+                if (gridTaken[m].transform.position.y > fullRowPositions[j])
+                {
+                    gridTaken[m].transform.Translate(0, -1, 0);
                 }
             }
         }
