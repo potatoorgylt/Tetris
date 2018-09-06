@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TetrisLevel : PlacedBlocks {
+public class TetrisLevel : MonoBehaviour {
 
     public float moveTime = 1.0f;
-    float timePassed = 0f;
 
     public int gridWidth;
     public int gridLength;
@@ -102,7 +101,7 @@ public class TetrisLevel : PlacedBlocks {
         }
 
         //Move down above
-        for (int j = 0; j < fullRowPositions.Count; j++)
+        for (int j = fullRowPositions.Count - 1; j >= 0; j--)
         {
             for (int m = 0; m < gridTaken.Count; m++)
             {

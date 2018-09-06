@@ -80,7 +80,7 @@ public class BlockBehaviour : MonoBehaviour {
                 }
             }
         }
-        if (blocks == null)
+        if (transform.childCount == 0)
             Destroy(gameObject);
     }
 
@@ -193,8 +193,6 @@ public class BlockBehaviour : MonoBehaviour {
     void PlaceBlock()
     {
         moving = false;
-        //for (int j = 0; j < rotations[curRotation].blockPositions.Length; j++)
-        //level.TakeSpace(transform.position + rotations[curRotation].blockPositions[j]);
         for (int i = 0; i < blocks.Length; i++)
             level.TakeSpace(blocks[i]);
         level.CheckLineFull();
