@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TetrisLevel : MonoBehaviour {
 
@@ -9,9 +10,12 @@ public class TetrisLevel : MonoBehaviour {
     public int gridWidth;
     public int gridLength;
 
-    public Vector3[,] grid;
-    //[HideInInspector]
-    public List<GameObject> gridTaken; //Deprecated
+    private float globalHeight;
+
+    public GameObject gameOverPanel;
+
+    [HideInInspector]
+    public List<GameObject> gridTaken;
 
     [HideInInspector]
     public float bottom;
@@ -22,10 +26,12 @@ public class TetrisLevel : MonoBehaviour {
     [HideInInspector]
     public float top;
 
+    ScoreAndLevel scoreAndLevel;
+
     private void Start()
     {
+        scoreAndLevel = GetComponent<ScoreAndLevel>();
         GetLevelEdges();
-        InitializeGrid();
     }
 
     void GetLevelEdges()
@@ -36,29 +42,31 @@ public class TetrisLevel : MonoBehaviour {
         rightBorder = transform.position.x + gridWidth / 2;
     }
 
-    void InitializeGrid()
+    public void TakeSpace(GameObject space)
     {
-        float posX = transform.position.x + gridWidth / 2 * (-1);
-        float posY = transform.position.y + gridLength / 2 * (-1);
+        gridTaken.Add(space);
+    }
 
-        grid = new Vector3[gridLength, gridWidth];
-
-        for (int i = 0; i < gridLength; i++)
+    public void CheckHeight(GameObject block)
+    {
+        Debug.Log(block.transform.position.y);
+        if(block.transform.position.y > (gridLength/2)-2)
         {
-            for (int j = 0; j < gridWidth-1; j++)
-            {
-                posX++;
-                grid[i, j] = new Vector3(posX, posY, 0);
-                //Debug.Log(grid[i, j]);
-            }
-            posX = transform.position.x + gridWidth / 2 * (-1);
-            posY++;
+            GameOver();
         }
     }
 
-    public void TakeSpace(GameObject space) //Deprecated
+    public void GameOver()
     {
-        gridTaken.Add(space);
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0.0F;
+    }
+
+    public void Retry()
+    {
+        Time.timeScale = 1.0F;
+        Scene scene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(scene.name);
     }
 
     public void CheckLineFull()
@@ -67,7 +75,6 @@ public class TetrisLevel : MonoBehaviour {
         List<float> fullRowPositions = new List<float>();
         List<int> rowFull = new List<int>();
         float bottomToTop = bottom - 0.5f + 1.0f;
-        Debug.Log("...rowFull function...");
 
         while (bottomToTop < top)
         {
@@ -83,8 +90,6 @@ public class TetrisLevel : MonoBehaviour {
                     }
                 }
             }
-            Debug.Log("rowFull[" + i + "]: " + rowFull[i]);
-            Debug.Log(bottomToTop);
             bottomToTop++;
             i++;
         }
@@ -96,6 +101,7 @@ public class TetrisLevel : MonoBehaviour {
                 if (gridTaken[k].transform.position.y == fullRowPositions[j])
                 {
                     Destroy(gridTaken[k]);
+                    scoreAndLevel.AddScore(15);
                 }
             }
         }

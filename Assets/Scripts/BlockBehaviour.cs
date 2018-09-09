@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockBehaviour : MonoBehaviour {
+    ScoreAndLevel scoreAndLevel;
     SpawnBlocks spawn;
     TetrisLevel level;
+
+    public int addScoreAmount = 50;
+
     float step = 1;
     bool moving = true;
 
@@ -28,7 +32,18 @@ public class BlockBehaviour : MonoBehaviour {
     float keyDelay = 0.05f;  // 1 second
     float timePassed = 0f;
 
+    //Mobile
+    private Vector3 fp;   //First touch position
+    private Vector3 lp;   //Last touch position
+    private float dragDistance;  //minimum distance for a swipe to be registered
+    //
+
     void Start () {
+        //Mobile
+        dragDistance = Screen.height * 5 / 100; //dragDistance is 5% height of the screen
+        //
+
+        scoreAndLevel = GameObject.FindGameObjectWithTag("Level").GetComponent<ScoreAndLevel>();
         level = GameObject.FindGameObjectWithTag("Level").GetComponent<TetrisLevel>();
         spawn = transform.parent.GetComponent<SpawnBlocks>();
 
@@ -41,6 +56,75 @@ public class BlockBehaviour : MonoBehaviour {
         {
             timePassed += Time.deltaTime;
             lrTimePassed += Time.deltaTime;
+
+            //Mobile
+            if (Input.touchCount == 1) // user is touching the screen with a single touch
+            {
+                Touch touch = Input.GetTouch(0); // get the touch
+                if (touch.phase == TouchPhase.Began) //check for the first touch
+                {
+                    fp = touch.position;
+                    lp = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Moved) // update the last position based on where they moved
+                {
+                    lp = touch.position;
+
+                    //Check if drag distance is greater than 20% of the screen height
+                    if (Mathf.Abs(lp.x - fp.x) > dragDistance || Mathf.Abs(lp.y - fp.y) > dragDistance)
+                    {//It's a drag
+                     //check if the drag is vertical or horizontal
+                        if (Mathf.Abs(lp.x - fp.x) > Mathf.Abs(lp.y - fp.y))
+                        {   //If the horizontal movement is greater than the vertical movement...
+                            if ((lp.x > fp.x))  //If the movement was to the right)
+                            {   //Right swipe
+                                Debug.Log("Right Drag");
+                                if (lrTimePassed >= lrKeyDelay)
+                                {
+                                    lrTimePassed = 0f;
+                                    MoveBlock(new Vector3(1, 0, 0));
+                                }
+                            }
+                            else
+                            {   //Left swipe
+                                Debug.Log("Left Drag");
+                                if (lrTimePassed >= lrKeyDelay)
+                                {
+                                    lrTimePassed = 0f;
+                                    MoveBlock(new Vector3(-1, 0, 0));
+                                }
+                            }
+                        }
+                        else
+                        {   //the vertical movement is greater than the horizontal movement
+                            if (lp.y > fp.y)  //If the movement was up
+                            {   //Up swipe
+                                Debug.Log("Up Drag");
+                            }
+                            else
+                            {   //Down swipe
+                                Debug.Log("Down Drag");
+                                if (timePassed >= keyDelay)
+                                {
+                                    timePassed = 0f;
+                                    MoveDown();
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (touch.phase == TouchPhase.Ended) //check if the finger is removed from the screen
+                {
+                    lp = touch.position;  //last touch position. Ommitted if you use list
+
+                    if (Mathf.Abs(lp.x - fp.x) > dragDistance || Mathf.Abs(lp.y - fp.y) > dragDistance){}
+                    else
+                    {
+                        RotateBlocks();
+                    }
+                }
+            }
+            //EndOfMobile
 
             if (Input.GetKey("left"))
             {
@@ -193,8 +277,12 @@ public class BlockBehaviour : MonoBehaviour {
     void PlaceBlock()
     {
         moving = false;
+        scoreAndLevel.AddScore(addScoreAmount);
         for (int i = 0; i < blocks.Length; i++)
+        {
+            level.CheckHeight(blocks[i]);
             level.TakeSpace(blocks[i]);
+        }
         level.CheckLineFull();
         spawn.CreateBlock();
     }
