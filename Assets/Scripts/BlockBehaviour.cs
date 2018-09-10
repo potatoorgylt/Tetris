@@ -27,6 +27,7 @@ public class BlockBehaviour : MonoBehaviour {
     float moveSpeed;
 
     float lrKeyDelay = 0.1f;
+    float lrMobKeyDelay = 0.05f;
     float lrTimePassed = 0f;
 
     float keyDelay = 0.05f;  // 1 second
@@ -36,6 +37,11 @@ public class BlockBehaviour : MonoBehaviour {
     private Vector3 fp;   //First touch position
     private Vector3 lp;   //Last touch position
     private float dragDistance;  //minimum distance for a swipe to be registered
+
+    float firstTouchDelay = 0.1f;
+    float firstTouchTimePassed = 0f;
+
+    bool canRotate = true;
     //
 
     void Start () {
@@ -54,8 +60,13 @@ public class BlockBehaviour : MonoBehaviour {
     {
         if (moving)
         {
+            //Get screen point pos
+            Vector3 blockScreenPos = Camera.main.WorldToScreenPoint(this.transform.position);
+            Debug.Log("target is " + blockScreenPos.x + " pixels from the left");
+
             timePassed += Time.deltaTime;
             lrTimePassed += Time.deltaTime;
+            firstTouchTimePassed += Time.deltaTime;
 
             //Mobile
             if (Input.touchCount == 1) // user is touching the screen with a single touch
@@ -68,6 +79,11 @@ public class BlockBehaviour : MonoBehaviour {
                 }
                 else if (touch.phase == TouchPhase.Moved) // update the last position based on where they moved
                 {
+                    //if (firstTouchTimePassed >= firstTouchDelay)
+                    //{
+                        //fp = touch.position;
+                        //firstTouchTimePassed = 0f;
+                    //}
                     lp = touch.position;
 
                     //Check if drag distance is greater than 20% of the screen height
@@ -78,20 +94,30 @@ public class BlockBehaviour : MonoBehaviour {
                         {   //If the horizontal movement is greater than the vertical movement...
                             if ((lp.x > fp.x))  //If the movement was to the right)
                             {   //Right swipe
-                                Debug.Log("Right Drag");
-                                if (lrTimePassed >= lrKeyDelay)
+                                Debug.Log("Right Drag: " + lp);
+                                if(lp.x > blockScreenPos.x)
                                 {
-                                    lrTimePassed = 0f;
-                                    MoveBlock(new Vector3(1, 0, 0));
+                                    if (lrTimePassed >= lrMobKeyDelay)
+                                    {
+                                        lrTimePassed = 0f;
+                                        MoveBlock(new Vector3(1, 0, 0));
+                                        fp = touch.position + new Vector2(0.1f, 0); //Please modify if up drag is used
+                                        canRotate = false;
+                                    }
                                 }
                             }
                             else
                             {   //Left swipe
-                                Debug.Log("Left Drag");
-                                if (lrTimePassed >= lrKeyDelay)
+                                Debug.Log("Left Drag: " + lp);
+                                if (lp.x < blockScreenPos.x)
                                 {
-                                    lrTimePassed = 0f;
-                                    MoveBlock(new Vector3(-1, 0, 0));
+                                    if (lrTimePassed >= lrMobKeyDelay)
+                                    {
+                                        lrTimePassed = 0f;
+                                        MoveBlock(new Vector3(-1, 0, 0));
+                                        fp = touch.position - new Vector2(0.1f, 0);
+                                        canRotate = false;
+                                    }
                                 }
                             }
                         }
@@ -100,6 +126,7 @@ public class BlockBehaviour : MonoBehaviour {
                             if (lp.y > fp.y)  //If the movement was up
                             {   //Up swipe
                                 Debug.Log("Up Drag");
+                                canRotate = false;
                             }
                             else
                             {   //Down swipe
@@ -108,6 +135,7 @@ public class BlockBehaviour : MonoBehaviour {
                                 {
                                     timePassed = 0f;
                                     MoveDown();
+                                    canRotate = false;
                                 }
                             }
                         }
@@ -117,11 +145,12 @@ public class BlockBehaviour : MonoBehaviour {
                 {
                     lp = touch.position;  //last touch position. Ommitted if you use list
 
-                    if (Mathf.Abs(lp.x - fp.x) > dragDistance || Mathf.Abs(lp.y - fp.y) > dragDistance){}
-                    else
+                    //if (Mathf.Abs(lp.x - fp.x) > dragDistance || Mathf.Abs(lp.y - fp.y) > dragDistance){}
+                    if(canRotate == true)
                     {
                         RotateBlocks();
                     }
+                    canRotate = true;
                 }
             }
             //EndOfMobile
